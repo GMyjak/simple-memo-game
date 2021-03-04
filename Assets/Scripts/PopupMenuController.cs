@@ -8,25 +8,38 @@ public class PopupMenuController : MonoBehaviour
 {
     [SerializeField]
     private Image popupMenuBackground;
+    
     public Image PopupMenuBackground
     {
         get => popupMenuBackground;
         set => popupMenuBackground = value;
     }
 
+    [SerializeField] 
+    private GameStateController gameStateController;
+
+    public GameStateController GameStateController
+    {
+        get => gameStateController;
+        set => gameStateController = value;
+    }
+
     public void On2x2ButtonClick()
     {
-        Debug.Log("2x2");
+        gameStateController.InitializeGameState(2, 2);
+        OnBackgroundClick();
     }
 
     public void On2x4ButtonClick()
     {
-        Debug.Log("2x4");
+        gameStateController.InitializeGameState(2, 4);
+        OnBackgroundClick();
     }
 
     public void On4x4ButtonClick()
     {
-        Debug.Log("4x4");
+        gameStateController.InitializeGameState(4, 4);
+        OnBackgroundClick();
     }
 
     public void OnBackgroundClick()
