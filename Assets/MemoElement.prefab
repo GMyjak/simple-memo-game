@@ -127,6 +127,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isGuessed: 0
   coverImage: {fileID: 624829928383251221}
+  contentImage: {fileID: 624829928387873651}
 --- !u!1 &624829928383251223
 GameObject:
   m_ObjectHideFlags: 0

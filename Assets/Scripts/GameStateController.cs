@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = System.Random;
 
 public class GameStateController : MonoBehaviour
 {
@@ -23,7 +25,19 @@ public class GameStateController : MonoBehaviour
         set => gridLayout = value;
     }
 
+    [SerializeField]
+    private MemoImagesSource imagesSource;
+
+    public MemoImagesSource ImagesSource
+    {
+        get => imagesSource;
+        set => imagesSource = value;
+    }
+
     private List<MemoElement> memoElements;
+    private int xSize;
+    private int ySize;
+
     private int score = 0;
     private float playTime = 0;
 
@@ -42,6 +56,8 @@ public class GameStateController : MonoBehaviour
         memoElements.Clear();
         score = 0;
         playTime = 0;
+        xSize = 0;
+        ySize = 0;
     }
 
     public void InitializeGameState(int xSize, int ySize)
@@ -55,6 +71,9 @@ public class GameStateController : MonoBehaviour
 
         ResetGameState();
 
+        this.xSize = xSize;
+        this.ySize = ySize;
+
         gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
         gridLayout.constraintCount = ySize;
 
@@ -62,6 +81,37 @@ public class GameStateController : MonoBehaviour
         {
             var newObject = Instantiate(MemoObjectPrefab, GridLayout.transform);
             memoElements.Add(newObject.GetComponent<MemoElement>());
+        }
+
+        RandomizeMemoElementSprites();
+    }
+
+    private void RandomizeMemoElementSprites()
+    {
+        int numberOfElementsToTake = xSize * ySize / 2;
+
+        if (imagesSource.Images.Count < numberOfElementsToTake)
+        {
+            throw new Exception($"Not enough images configured " +
+                                $"({imagesSource.Images.Count} but {numberOfElementsToTake} are needed)");
+        }
+
+        var rnd = new Random();
+        var chosenImages = new List<Sprite>(imagesSource.Images)
+            .OrderBy(img => rnd.Next())
+            .Take(numberOfElementsToTake)
+            .ToList();
+
+        var memoElementsTemp = new List<MemoElement>(memoElements)
+            .OrderBy(elem => rnd.Next())
+            .ToList();
+
+        for (int i = 0; i < numberOfElementsToTake; i++)
+        {
+            memoElementsTemp[2 * i].ContentImage.sprite = chosenImages[i];
+            memoElementsTemp[2 * i + 1].ContentImage.sprite = chosenImages[i];
+            memoElementsTemp[2 * i].ImageId = i;
+            memoElementsTemp[2 * i + 1].ImageId = i;
         }
     }
 }

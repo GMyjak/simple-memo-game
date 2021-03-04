@@ -24,26 +24,34 @@ public class PopupMenuController : MonoBehaviour
         set => gameStateController = value;
     }
 
+    private bool isFirstInitialization = true;
+
     public void On2x2ButtonClick()
     {
         gameStateController.InitializeGameState(2, 2);
+        isFirstInitialization = false;
         OnBackgroundClick();
     }
 
     public void On2x4ButtonClick()
     {
         gameStateController.InitializeGameState(2, 4);
+        isFirstInitialization = false;
         OnBackgroundClick();
     }
 
     public void On4x4ButtonClick()
     {
         gameStateController.InitializeGameState(4, 4);
+        isFirstInitialization = false;
         OnBackgroundClick();
     }
 
     public void OnBackgroundClick()
     {
-        PopupMenuBackground.gameObject.SetActive(false);
+        if (!isFirstInitialization)
+        {
+            PopupMenuBackground.gameObject.SetActive(false);
+        }
     }
 }

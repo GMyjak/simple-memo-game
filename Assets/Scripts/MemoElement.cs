@@ -23,4 +23,14 @@ public class MemoElement : MonoBehaviour
         set => coverImage = value;
     }
 
+    [SerializeField]
+    private Image contentImage;
+
+    public Image ContentImage
+    {
+        get => contentImage;
+        set => contentImage = value;
+    }
+
+    public int ImageId { get; set; } = -1;
 }
