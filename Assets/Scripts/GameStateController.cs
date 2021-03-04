@@ -38,8 +38,10 @@ public class GameStateController : MonoBehaviour
     private int xSize;
     private int ySize;
 
-    private int score = 0;
-    private float playTime = 0;
+    private MemoElement currentlyRevealedElement;
+
+    public Action OnGameReset = () => { };
+    public Action OnElementsGuessed = () => { };
 
     private void Awake()
     {
@@ -54,8 +56,6 @@ public class GameStateController : MonoBehaviour
         }
 
         memoElements.Clear();
-        score = 0;
-        playTime = 0;
         xSize = 0;
         ySize = 0;
     }
@@ -80,7 +80,33 @@ public class GameStateController : MonoBehaviour
         for (int i = 0; i < numberOfElements; i++)
         {
             var newObject = Instantiate(MemoObjectPrefab, GridLayout.transform);
-            memoElements.Add(newObject.GetComponent<MemoElement>());
+            var memoElement = newObject.GetComponent<MemoElement>();
+            memoElements.Add(memoElement);
+
+            memoElement.OnMemoElementRevealed += () =>
+            {
+                if (currentlyRevealedElement == null)
+                {
+                    currentlyRevealedElement = memoElement;
+                }
+                else if (currentlyRevealedElement.ImageId == memoElement.ImageId)
+                {
+                    currentlyRevealedElement.IsGuessed = true;
+                    memoElement.IsGuessed = true;
+                    currentlyRevealedElement = null;
+                    OnElementsGuessed?.Invoke();
+                }
+                else
+                {
+                    StartCoroutine(currentlyRevealedElement.CountdownAndHideCoroutine());
+                    StartCoroutine(memoElement.CountdownAndHideCoroutine());
+                }
+            };
+
+            memoElement.OnMemoElementHidden += () =>
+            {
+                currentlyRevealedElement = null;
+            };
         }
 
         RandomizeMemoElementSprites();
