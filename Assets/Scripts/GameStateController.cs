@@ -36,7 +36,7 @@ public class GameStateController : MonoBehaviour
     {
         foreach (var elem in memoElements)
         {
-            Destroy(elem);
+            Destroy(elem.gameObject);
         }
 
         memoElements.Clear();
@@ -56,7 +56,7 @@ public class GameStateController : MonoBehaviour
         ResetGameState();
 
         gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-        gridLayout.constraintCount = xSize;
+        gridLayout.constraintCount = ySize;
 
         for (int i = 0; i < numberOfElements; i++)
         {
