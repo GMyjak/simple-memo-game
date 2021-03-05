@@ -42,6 +42,15 @@ public class ScoreManager : MonoBehaviour
         set => initialScore = value;
     }
 
+    [SerializeField] 
+    private GameOverPanelController gameOverPanel;
+
+    public GameOverPanelController GameOverPanel
+    {
+        get => gameOverPanel;
+        set => gameOverPanel = value;
+    }
+
     private int score;
     private int highScore = 0;
     private string highScoreKey = "highScore";
@@ -118,19 +127,24 @@ public class ScoreManager : MonoBehaviour
     {
         isPlaying = false;
         StopCoroutine(decrementCoroutine);
-        Debug.Log("Game over message");
+        gameOverPanel.Show("You lost!", $"Score: {score}", "");
     }
 
     private void GameWon()
     {
         isPlaying = false;
         StopCoroutine(decrementCoroutine);
+        
         if (score > highScore)
         {
             highScore = score;
             UpdateUi();
             PlayerPrefs.SetInt(highScoreKey, highScore);
             PlayerPrefs.Save();
+            gameOverPanel.Show("You won!", $"Score: {score}", 
+                "New highscore!");
         }
+
+        gameOverPanel.Show("You won!", $"Score: {score}", "");
     }
 }
