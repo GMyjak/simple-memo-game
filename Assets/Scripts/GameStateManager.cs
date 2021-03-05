@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Random = System.Random;
 
-public class GameStateController : MonoBehaviour
+public class GameStateManager : MonoBehaviour
 {
     [SerializeField] 
     private GameObject memoObjectPrefab;
@@ -42,6 +42,8 @@ public class GameStateController : MonoBehaviour
 
     public Action OnGameReset = () => { };
     public Action OnElementsGuessed = () => { };
+    public Action OnElementGuessedWrong = () => { };
+    public Action OnGameFinished = () => { };
 
     private void Awake()
     {
@@ -58,6 +60,8 @@ public class GameStateController : MonoBehaviour
         memoElements.Clear();
         xSize = 0;
         ySize = 0;
+
+        OnGameReset?.Invoke();
     }
 
     public void InitializeGameState(int xSize, int ySize)
@@ -95,11 +99,16 @@ public class GameStateController : MonoBehaviour
                     memoElement.IsGuessed = true;
                     currentlyRevealedElement = null;
                     OnElementsGuessed?.Invoke();
+                    if (IsGameOver())
+                    {
+                        OnGameFinished?.Invoke();
+                    }
                 }
                 else
                 {
                     StartCoroutine(currentlyRevealedElement.CountdownAndHideCoroutine());
                     StartCoroutine(memoElement.CountdownAndHideCoroutine());
+                    OnElementGuessedWrong?.Invoke();
                 }
             };
 
@@ -139,5 +148,10 @@ public class GameStateController : MonoBehaviour
             memoElementsTemp[2 * i].ImageId = i;
             memoElementsTemp[2 * i + 1].ImageId = i;
         }
+    }
+
+    private bool IsGameOver()
+    {
+        return memoElements.All(element => element.IsGuessed);
     }
 }

@@ -13,33 +13,33 @@ public class PopupMenuController : MonoBehaviour
     }
 
     [SerializeField] 
-    private GameStateController gameStateController;
+    private GameStateManager gameStateManager;
 
-    public GameStateController GameStateController
+    public GameStateManager GameStateManager
     {
-        get => gameStateController;
-        set => gameStateController = value;
+        get => gameStateManager;
+        set => gameStateManager = value;
     }
 
     private bool isFirstInitialization = true;
 
     public void On2x2ButtonClick()
     {
-        gameStateController.InitializeGameState(2, 2);
+        gameStateManager.InitializeGameState(2, 2);
         isFirstInitialization = false;
         OnBackgroundClick();
     }
 
     public void On2x4ButtonClick()
     {
-        gameStateController.InitializeGameState(2, 4);
+        gameStateManager.InitializeGameState(2, 4);
         isFirstInitialization = false;
         OnBackgroundClick();
     }
 
     public void On4x4ButtonClick()
     {
-        gameStateController.InitializeGameState(4, 4);
+        gameStateManager.InitializeGameState(4, 4);
         isFirstInitialization = false;
         OnBackgroundClick();
     }
