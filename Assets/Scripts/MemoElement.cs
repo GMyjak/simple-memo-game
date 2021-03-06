@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class MemoElement : MonoBehaviour
 {
-    [SerializeField] 
+    [SerializeField]
     private bool isGuessed;
 
     public bool IsGuessed
@@ -14,7 +14,7 @@ public class MemoElement : MonoBehaviour
         set => isGuessed = value;
     }
 
-    [SerializeField] 
+    [SerializeField]
     private Image coverImage;
 
     public Image CoverImage
@@ -41,6 +41,15 @@ public class MemoElement : MonoBehaviour
         set => timeToHide = value;
     }
 
+    [SerializeField] 
+    private float fadeTime = 0.5f;
+
+    public float FadeTime
+    {
+        get => fadeTime;
+        set => fadeTime = value;
+    }
+
     public int ImageId { get; set; } = -1;
 
     public Action OnMemoElementRevealed { get; set; } = () => { };
@@ -48,26 +57,80 @@ public class MemoElement : MonoBehaviour
 
     private static bool actionLockedByCountdown = false;
 
+    void Awake()
+    {
+        coverImage.material = new Material(coverImage.material);
+        coverImage.material.SetFloat("_Fade", 1);
+    }
+
     public void OnCoverButtonClicked()
     {
         if (actionLockedByCountdown)
         {
             return;
         }
-        coverImage.gameObject.SetActive(false);
+        //coverImage.gameObject.SetActive(false);
+        //OnMemoElementRevealed?.Invoke();
+        StartCoroutine(FadeOutCoroutine());
+    }
+
+    public IEnumerator CountdownAndFadeInCoroutine()
+    {
+        actionLockedByCountdown = true;
+        yield return new WaitForSeconds(timeToHide - fadeTime);
+        if (!isGuessed)
+        {
+            //CoverImage.gameObject.SetActive(true);
+            Material coverImageMat = coverImage.material;
+
+            coverImageMat.SetFloat("_Fade", 1);
+        }
+
+        //OnMemoElementHidden?.Invoke();
+        //actionLockedByCountdown = false;
+        StartCoroutine(FadeInCoroutine());
+    }
+
+    private IEnumerator FadeOutCoroutine()
+    {
+        float alpha = 1;
+        Material coverImageMat = coverImage.material;
+
+        coverImageMat.SetFloat("_Fade", alpha);
+
+        while (alpha > 0)
+        {
+            alpha -= (Time.deltaTime / fadeTime);
+            yield return new WaitForEndOfFrame();
+            if (alpha < 0)
+            {
+                alpha = 0;
+            }
+            coverImageMat.SetFloat("_Fade", alpha);
+        }
+
         OnMemoElementRevealed?.Invoke();
     }
 
-    public IEnumerator CountdownAndHideCoroutine()
+    private IEnumerator FadeInCoroutine()
     {
-        actionLockedByCountdown = true;
-        yield return new WaitForSeconds(timeToHide);
-        OnMemoElementHidden?.Invoke();
-        if (!isGuessed)
+        float alpha = 0;
+        Material coverImageMat = coverImage.material;
+
+        coverImageMat.SetFloat("_Fade", alpha);
+
+        while (alpha < 1)
         {
-            CoverImage.gameObject.SetActive(true);
+            alpha += (Time.deltaTime / fadeTime);
+            yield return new WaitForEndOfFrame();
+            if (alpha > 1)
+            {
+                alpha = 1;
+            }
+            coverImageMat.SetFloat("_Fade", alpha);
         }
 
+        OnMemoElementHidden?.Invoke();
         actionLockedByCountdown = false;
     }
 }

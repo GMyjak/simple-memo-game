@@ -106,8 +106,8 @@ public class GameStateManager : MonoBehaviour
                 }
                 else
                 {
-                    StartCoroutine(currentlyRevealedElement.CountdownAndHideCoroutine());
-                    StartCoroutine(memoElement.CountdownAndHideCoroutine());
+                    StartCoroutine(currentlyRevealedElement.CountdownAndFadeInCoroutine());
+                    StartCoroutine(memoElement.CountdownAndFadeInCoroutine());
                     OnElementGuessedWrong?.Invoke();
                 }
             };

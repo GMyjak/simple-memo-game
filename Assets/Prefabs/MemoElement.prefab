@@ -128,7 +128,7 @@ MonoBehaviour:
   isGuessed: 0
   coverImage: {fileID: 624829928383251221}
   contentImage: {fileID: 624829928387873651}
-  timeToHide: 1.5
+  timeToHide: 2
 --- !u!1 &624829928383251223
 GameObject:
   m_ObjectHideFlags: 0
@@ -187,7 +187,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 2100000, guid: c5adfda798a7c6743b1df2ef17477f0c, type: 2}
   m_Color: {r: 0.92156863, g: 0.36862746, b: 0.043137256, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
