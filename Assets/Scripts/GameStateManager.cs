@@ -5,41 +5,28 @@ using UnityEngine;
 using UnityEngine.UI;
 using Random = System.Random;
 
+/// <summary>
+/// This component controls game state
+/// It is also responsible for game initialization
+/// </summary>
 public class GameStateManager : MonoBehaviour
 {
     [SerializeField] 
     private GameObject memoObjectPrefab;
 
-    public GameObject MemoObjectPrefab
-    {
-        get => memoObjectPrefab;
-        set => memoObjectPrefab = value;
-    }
-
     [SerializeField] 
     private GridLayoutGroup gridLayout;
-
-    public GridLayoutGroup GridLayout
-    {
-        get => gridLayout;
-        set => gridLayout = value;
-    }
 
     [SerializeField]
     private MemoImagesSource imagesSource;
 
-    public MemoImagesSource ImagesSource
-    {
-        get => imagesSource;
-        set => imagesSource = value;
-    }
-
+    // Private game state
     private List<MemoElement> memoElements;
+    private MemoElement currentlyRevealedElement;
     private int xSize;
     private int ySize;
 
-    private MemoElement currentlyRevealedElement;
-
+    // Public callbacks
     public Action OnGameReset = () => { };
     public Action OnElementsGuessed = () => { };
     public Action OnElementGuessedWrong = () => { };
@@ -52,6 +39,7 @@ public class GameStateManager : MonoBehaviour
 
     public void ResetGameState()
     {
+        // Destroy all instantiated prefabs
         foreach (var elem in memoElements)
         {
             Destroy(elem.gameObject);
@@ -68,6 +56,8 @@ public class GameStateManager : MonoBehaviour
     {
         int numberOfElements = xSize * ySize;
 
+        // Theoretically this method allows to create boards larger than 4x4
+        // This exception will be thrown if number of elements is odd (cannot create pairs)
         if (xSize % 2 != 0 && ySize % 2 != 0)
         {
             throw new Exception($"Number of elements has to be even (current: {numberOfElements})");
@@ -78,6 +68,7 @@ public class GameStateManager : MonoBehaviour
         this.xSize = xSize;
         this.ySize = ySize;
 
+        // This will set dimensions of grid layout
         gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
         gridLayout.constraintCount = ySize;
 
@@ -99,7 +90,7 @@ public class GameStateManager : MonoBehaviour
                     memoElement.IsGuessed = true;
                     currentlyRevealedElement = null;
                     OnElementsGuessed?.Invoke();
-                    if (IsGameOver())
+                    if (memoElements.All(element => element.IsGuessed))
                     {
                         OnGameFinished?.Invoke();
                     }
@@ -123,8 +114,11 @@ public class GameStateManager : MonoBehaviour
 
     private void RandomizeMemoElementSprites()
     {
+        // If game size is 16, we need only 8 sprites
         int numberOfElementsToTake = xSize * ySize / 2;
 
+        // It is possible to initialize boards of very large sizes (InitializeGameState method)
+        // There can be not enough Sprites configured to provide graphics for all elements
         if (imagesSource.Images.Count < numberOfElementsToTake)
         {
             throw new Exception($"Not enough images configured " +
@@ -132,15 +126,19 @@ public class GameStateManager : MonoBehaviour
         }
 
         var rnd = new Random();
+        
+        // Copy source sprites list, randomize their order and take amount needed
         var chosenImages = new List<Sprite>(imagesSource.Images)
-            .OrderBy(img => rnd.Next())
+            .OrderBy(_ => rnd.Next())
             .Take(numberOfElementsToTake)
             .ToList();
 
+        // Copy all instantiated memo elements and arrange them randomly
         var memoElementsTemp = new List<MemoElement>(memoElements)
-            .OrderBy(elem => rnd.Next())
+            .OrderBy(_ => rnd.Next())
             .ToList();
 
+        // Since both sprite and memo element lists have been randomized, I can just assign sprite for next two memo elements 
         for (int i = 0; i < numberOfElementsToTake; i++)
         {
             memoElementsTemp[2 * i].ContentImage.sprite = chosenImages[i];
@@ -150,8 +148,25 @@ public class GameStateManager : MonoBehaviour
         }
     }
 
-    private bool IsGameOver()
+    #region Wrappers
+
+    public GameObject MemoObjectPrefab
     {
-        return memoElements.All(element => element.IsGuessed);
+        get => memoObjectPrefab;
+        set => memoObjectPrefab = value;
     }
+
+    public GridLayoutGroup GridLayout
+    {
+        get => gridLayout;
+        set => gridLayout = value;
+    }
+
+    public MemoImagesSource ImagesSource
+    {
+        get => imagesSource;
+        set => imagesSource = value;
+    }
+
+    #endregion
 }

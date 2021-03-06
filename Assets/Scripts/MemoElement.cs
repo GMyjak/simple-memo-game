@@ -3,62 +3,37 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// This component is mounted on MemoElement prefab (single card on game board)
+/// </summary>
 public class MemoElement : MonoBehaviour
 {
     [SerializeField]
     private bool isGuessed;
 
-    public bool IsGuessed
-    {
-        get => isGuessed;
-        set => isGuessed = value;
-    }
-
     [SerializeField]
     private Image coverImage;
-
-    public Image CoverImage
-    {
-        get => coverImage;
-        set => coverImage = value;
-    }
 
     [SerializeField]
     private Image contentImage;
 
-    public Image ContentImage
-    {
-        get => contentImage;
-        set => contentImage = value;
-    }
-
     [SerializeField] 
     private float timeToHide = 1.5f;
-
-    public float TimeToHide
-    {
-        get => timeToHide;
-        set => timeToHide = value;
-    }
 
     [SerializeField] 
     private float fadeTime = 0.5f;
 
-    public float FadeTime
-    {
-        get => fadeTime;
-        set => fadeTime = value;
-    }
 
     public int ImageId { get; set; } = -1;
-
     public Action OnMemoElementRevealed { get; set; } = () => { };
     public Action OnMemoElementHidden { get; set; } = () => { };
 
+    // Two elements have been clicked, are currently revealed and so you can't click any other
     private static bool actionLockedByCountdown = false;
 
     void Awake()
     {
+        // New material has to be instantiated, otherwise fading one element will fae them all
         coverImage.material = new Material(coverImage.material);
         coverImage.material.SetFloat("_Fade", 1);
     }
@@ -69,8 +44,6 @@ public class MemoElement : MonoBehaviour
         {
             return;
         }
-        //coverImage.gameObject.SetActive(false);
-        //OnMemoElementRevealed?.Invoke();
         StartCoroutine(FadeOutCoroutine());
     }
 
@@ -80,14 +53,9 @@ public class MemoElement : MonoBehaviour
         yield return new WaitForSeconds(timeToHide - fadeTime);
         if (!isGuessed)
         {
-            //CoverImage.gameObject.SetActive(true);
             Material coverImageMat = coverImage.material;
-
             coverImageMat.SetFloat("_Fade", 1);
         }
-
-        //OnMemoElementHidden?.Invoke();
-        //actionLockedByCountdown = false;
         StartCoroutine(FadeInCoroutine());
     }
 
@@ -133,4 +101,38 @@ public class MemoElement : MonoBehaviour
         OnMemoElementHidden?.Invoke();
         actionLockedByCountdown = false;
     }
+
+    #region Wrappers
+
+    public bool IsGuessed
+    {
+        get => isGuessed;
+        set => isGuessed = value;
+    }
+
+    public Image CoverImage
+    {
+        get => coverImage;
+        set => coverImage = value;
+    }
+
+    public Image ContentImage
+    {
+        get => contentImage;
+        set => contentImage = value;
+    }
+
+    public float TimeToHide
+    {
+        get => timeToHide;
+        set => timeToHide = value;
+    }
+
+    public float FadeTime
+    {
+        get => fadeTime;
+        set => fadeTime = value;
+    }
+
+    #endregion
 }

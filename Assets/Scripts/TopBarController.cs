@@ -1,8 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// This component controls top bar menu
+/// </summary>
 public class TopBarController : MonoBehaviour
 {
     [SerializeField]

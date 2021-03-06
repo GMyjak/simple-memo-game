@@ -1,66 +1,50 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using TMPro;
 using UnityEngine;
 
+/// <summary>
+/// This component manages player score and high score
+/// </summary>
 public class ScoreManager : MonoBehaviour
 {
     [SerializeField] 
     private TMP_Text scoreDisplay;
-    
-    public TMP_Text ScoreDisplay
-    {
-        get => scoreDisplay;
-        set => scoreDisplay = value;
-    }
 
     [SerializeField] 
     private TMP_Text highScoreDisplay;
-    
-    public TMP_Text HighScoreDisplay
-    {
-        get => highScoreDisplay;
-        set => highScoreDisplay = value;
-    }
 
     [SerializeField] 
     private GameStateManager stateManager;
 
-    public GameStateManager StateManager
-    {
-        get => stateManager;
-        set => stateManager = value;
-    }
-
     [SerializeField] 
     private int initialScore = 30;
-
-    public int InitialScore
-    {
-        get => initialScore;
-        set => initialScore = value;
-    }
 
     [SerializeField] 
     private GameOverPanelController gameOverPanel;
 
-    public GameOverPanelController GameOverPanel
-    {
-        get => gameOverPanel;
-        set => gameOverPanel = value;
-    }
+    private const string HighScoreKey = "highScore";
 
     private int score;
     private int highScore = 0;
-    private string highScoreKey = "highScore";
     private bool isPlaying = false;
     private Coroutine decrementCoroutine;
 
     private void Awake()
     {
+        // Configure score and high score
         score = initialScore;
 
+        if (PlayerPrefs.HasKey(HighScoreKey))
+        {
+            highScore = PlayerPrefs.GetInt(HighScoreKey);
+        }
+        else
+        {
+            PlayerPrefs.SetInt(HighScoreKey, highScore);
+            PlayerPrefs.Save();
+        }
+
+        // Configure callbacks
         stateManager.OnGameReset += Reset;
         stateManager.OnGameFinished += GameWon;
 
@@ -75,16 +59,6 @@ public class ScoreManager : MonoBehaviour
             score -= 2;
             UpdateUi();
         };
-
-        if (PlayerPrefs.HasKey(highScoreKey))
-        {
-            highScore = PlayerPrefs.GetInt(highScoreKey);
-        }
-        else
-        {
-            PlayerPrefs.SetInt(highScoreKey, highScore);
-            PlayerPrefs.Save();
-        }
 
         UpdateUi();
     }
@@ -103,6 +77,7 @@ public class ScoreManager : MonoBehaviour
         HighScoreDisplay.text = highScore.ToString();
     }
 
+    // This coroutine decrements score every one second
     private IEnumerator DecrementScore()
     {
         while (score > 0)
@@ -139,7 +114,7 @@ public class ScoreManager : MonoBehaviour
         {
             highScore = score;
             UpdateUi();
-            PlayerPrefs.SetInt(highScoreKey, highScore);
+            PlayerPrefs.SetInt(HighScoreKey, highScore);
             PlayerPrefs.Save();
             gameOverPanel.Show("You won!", $"Score: {score}", 
                 "New highscore!");
@@ -147,4 +122,38 @@ public class ScoreManager : MonoBehaviour
 
         gameOverPanel.Show("You won!", $"Score: {score}", "");
     }
+
+    #region Wrappers
+
+    public TMP_Text ScoreDisplay
+    {
+        get => scoreDisplay;
+        set => scoreDisplay = value;
+    }
+
+    public TMP_Text HighScoreDisplay
+    {
+        get => highScoreDisplay;
+        set => highScoreDisplay = value;
+    }
+
+    public GameStateManager StateManager
+    {
+        get => stateManager;
+        set => stateManager = value;
+    }
+
+    public int InitialScore
+    {
+        get => initialScore;
+        set => initialScore = value;
+    }
+
+    public GameOverPanelController GameOverPanel
+    {
+        get => gameOverPanel;
+        set => gameOverPanel = value;
+    }
+
+    #endregion
 }

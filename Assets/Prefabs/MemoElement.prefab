@@ -128,7 +128,8 @@ MonoBehaviour:
   isGuessed: 0
   coverImage: {fileID: 624829928383251221}
   contentImage: {fileID: 624829928387873651}
-  timeToHide: 2
+  timeToHide: 1.5
+  fadeTime: 0.5
 --- !u!1 &624829928383251223
 GameObject:
   m_ObjectHideFlags: 0
