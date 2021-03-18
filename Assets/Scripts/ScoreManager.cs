@@ -67,6 +67,11 @@ public class ScoreManager : MonoBehaviour
     {
         score = initialScore;
         isPlaying = true;
+        if (decrementCoroutine != null)
+        {
+            StopCoroutine(decrementCoroutine);
+            decrementCoroutine = null;
+        }
         decrementCoroutine = StartCoroutine(DecrementScore());
         UpdateUi();
     }
@@ -102,6 +107,7 @@ public class ScoreManager : MonoBehaviour
     {
         isPlaying = false;
         StopCoroutine(decrementCoroutine);
+        decrementCoroutine = null;
         gameOverPanel.Show("You lost!", $"Score: {score}", "");
     }
 
@@ -109,7 +115,8 @@ public class ScoreManager : MonoBehaviour
     {
         isPlaying = false;
         StopCoroutine(decrementCoroutine);
-        
+        decrementCoroutine = null;
+
         if (score > highScore)
         {
             highScore = score;
